@@ -8,6 +8,8 @@
 
 var chunker = /((?:\((?:\([^()]+\)|[^()]+)+\)|\[(?:\[[^[\]]*\]|['"][^'"]*['"]|[^[\]'"]+)+\]|\\.|[^ >+~,(\[\\]+)+|[>+~])(\s*,\s*)?/g,
 	done = 0,
+	push = Array.prototype.push,
+	slice = Array.prototype.slice,
 	toString = Object.prototype.toString,
 	hasDuplicate = false;
 
@@ -18,19 +20,19 @@ var Sizzle = function(selector, context, results, seed) {
 	if ( context.nodeType !== 1 && context.nodeType !== 9 ) {
 		return [];
 	}
-	
+
 	if ( !selector || typeof selector !== "string" ) {
 		return results;
 	}
 
 	var parts = [], m, set, checkSet, check, mode, extra, prune = true, contextXML = isXML(context);
-	
+
 	// Reset the position of the chunker regexp (start from head)
 	chunker.lastIndex = 0;
-	
+
 	while ( (m = chunker.exec(selector)) !== null ) {
 		parts.push( m[1] );
-		
+
 		if ( m[2] ) {
 			extra = RegExp.rightContext;
 			break;
@@ -159,7 +161,7 @@ Sizzle.find = function(expr, context, isXML){
 
 	for ( var i = 0, l = Expr.order.length; i < l; i++ ) {
 		var type = Expr.order[i], match;
-		
+
 		if ( (match = Expr.match[ type ].exec( expr )) ) {
 			var left = RegExp.leftContext;
 
@@ -421,7 +423,7 @@ var Expr = Sizzle.selectors = {
 		},
 		ATTR: function(match, curLoop, inplace, result, not, isXML){
 			var name = match[1].replace(/\\/g, "");
-			
+
 			if ( !isXML && Expr.attrMap[name] ) {
 				match[1] = Expr.attrMap[name];
 			}
@@ -447,7 +449,7 @@ var Expr = Sizzle.selectors = {
 			} else if ( Expr.match.POS.test( match[0] ) || Expr.match.CHILD.test( match[0] ) ) {
 				return true;
 			}
-			
+
 			return match;
 		},
 		POS: function(match){
@@ -581,20 +583,20 @@ var Expr = Sizzle.selectors = {
 					if ( first == 1 && last == 0 ) {
 						return true;
 					}
-					
+
 					var doneName = match[0],
 						parent = elem.parentNode;
-	
+
 					if ( parent && (parent.sizcache !== doneName || !elem.nodeIndex) ) {
 						var count = 0;
 						for ( node = parent.firstChild; node; node = node.nextSibling ) {
 							if ( node.nodeType === 1 ) {
 								node.nodeIndex = ++count;
 							}
-						} 
+						}
 						parent.sizcache = doneName;
 					}
-					
+
 					var diff = elem.nodeIndex - last;
 					if ( first == 0 ) {
 						return diff == 0;
@@ -661,20 +663,20 @@ for ( var type in Expr.match ) {
 }
 
 var makeArray = function(array, results) {
-	array = Array.prototype.slice.call( array, 0 );
+	array = slice.call( array, 0 );
 
 	if ( results ) {
 		results.push.apply( results, array );
 		return results;
 	}
-	
+
 	return array;
 };
 
 // Perform a simple check to determine if the browser is capable of
 // converting a NodeList to an array using builtin methods.
 try {
-	Array.prototype.slice.call( document.documentElement.childNodes, 0 );
+	slice.call( document.documentElement.childNodes, 0 );
 
 // Provide a fallback method if it does not work
 } catch(e){
@@ -682,7 +684,7 @@ try {
 		var ret = results || [];
 
 		if ( toString.call(array) === "[object Array]" ) {
-			Array.prototype.push.apply( ret, array );
+			push.apply( ret, array );
 		} else {
 			if ( typeof array.length === "number" ) {
 				for ( var i = 0, l = array.length; i < l; i++ ) {
@@ -815,7 +817,7 @@ if ( document.querySelectorAll ) (function(){
 	if ( div.querySelectorAll && div.querySelectorAll(".TEST").length === 0 ) {
 		return;
 	}
-	
+
 	Sizzle = function(query, context, extra, seed){
 		context = context || document;
 
@@ -826,7 +828,7 @@ if ( document.querySelectorAll ) (function(){
 				return makeArray( context.querySelectorAll(query), extra );
 			} catch(e){}
 		}
-		
+
 		return oldSizzle(query, context, extra, seed);
 	};
 
